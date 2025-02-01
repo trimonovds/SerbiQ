@@ -2,8 +2,8 @@
 // https://docs.swift.org/swift-book
 
 import ComposableArchitecture
-import SwiftUI
 import Domain
+import SwiftUI
 
 @Reducer
 struct MultipleChoiceExerciseFeature {

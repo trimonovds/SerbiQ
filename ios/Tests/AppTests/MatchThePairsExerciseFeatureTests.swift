@@ -1,7 +1,8 @@
-@testable import App
 import ComposableArchitecture
 import Domain
 import Testing
+
+@testable import App
 
 @Suite("MatchThePairsExerciseFeatureTests")
 @MainActor
@@ -94,8 +95,8 @@ struct MatchThePairsExerciseFeatureTests {
     }
 }
 
-private extension MatchThePairsData {
-    static let mock = Self(
+extension MatchThePairsData {
+    fileprivate static let mock = Self(
         prompt: "Match these Serbian words to their English translations:",
         pairs: [
             "mačka": "cat",
