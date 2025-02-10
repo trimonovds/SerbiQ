@@ -102,7 +102,12 @@ struct MatchThePairsExerciseFeature {
       case .delegate:
         return .none
       case .completeMatch:
-        return switchCells(into: &state, that: .matched, to: .disabled)
+        let switchCellsEffect = switchCells(into: &state, that: .matched, to: .disabled)
+        let isComplete = state[.left].allSatisfy { $0.state == .disabled } && state[.right].allSatisfy { $0.state == .disabled }
+        return .concatenate(
+          switchCellsEffect,
+          isComplete ? .send(.delegate(.complete)) : .none
+        )
       case .completeMatchError:
         return switchCells(into: &state, that: .error, to: .normal)
       case let .leftCells(.element(id, action: .tapped)):
@@ -129,8 +134,10 @@ struct MatchThePairsExerciseFeature {
     else {
       return .none
     }
-    state[leftCell.id, .left]?.state = newCellState
-    state[rightCell.id, .right]?.state = newCellState
+    withAnimation {
+      state[leftCell.id, .left]?.state = newCellState
+      state[rightCell.id, .right]?.state = newCellState
+    }
     return .none
   }
 
@@ -145,12 +152,18 @@ struct MatchThePairsExerciseFeature {
     }
     let otherColumn = column.opposite
     if state[column].selectedCell == nil && state[otherColumn].selectedCell == nil { // select if no selected word
-      state[id, column]?.state = .selected
+      withAnimation {
+        state[id, column]?.state = .selected
+      }
     } else if cell.state == .selected { // deselect if selected
-      state[id, column]?.state = .normal
+      withAnimation {
+        state[id, column]?.state = .normal
+      }
     } else if let tappedColumnSelectedCell = state[column].selectedCell { // change tapped column cells selection if already has selected cell
-      state[tappedColumnSelectedCell.id, column]?.state = .normal
-      state[id, column]?.state = .selected
+      withAnimation {
+        state[tappedColumnSelectedCell.id, column]?.state = .normal
+        state[id, column]?.state = .selected
+      }
     } else if let otherColumnSelectedCell = state[otherColumn].selectedCell {
       let leftColumnCell = switch column {
       case .left: cell
@@ -162,17 +175,21 @@ struct MatchThePairsExerciseFeature {
       }
       let match = state.data.pairs[leftColumnCell.word] == rightColumnCell.word
       if match { // change to matched if other column cells has selected and it is a match
-        state[id, column]?.state = .matched
-        state[otherColumnSelectedCell.id, otherColumn]?.state = .matched
+        withAnimation {
+          state[id, column]?.state = .matched
+          state[otherColumnSelectedCell.id, otherColumn]?.state = .matched
+        }
         return .run { send in
-          try await clock.sleep(for: transitionDuration)
+          try await clock.sleep(for: wordCellTransitionDuration)
           await send(.completeMatch)
         }
       } else { // change to error if other column cells has selected and it is not a match
-        state[id, column]?.state = .error
-        state[otherColumnSelectedCell.id, otherColumn]?.state = .error
+        withAnimation {
+          state[id, column]?.state = .error
+          state[otherColumnSelectedCell.id, otherColumn]?.state = .error
+        }
         return .run { send in
-          try await clock.sleep(for: transitionDuration)
+          try await clock.sleep(for: wordCellTransitionDuration)
           await send(.completeMatchError)
         }
       }
@@ -193,7 +210,7 @@ extension IdentifiedArrayOf<WordCellFeature.State> {
   }
 }
 
-private let transitionDuration: Duration = .seconds(1.0)
+let wordCellTransitionDuration: Duration = .seconds(1.0)
 
 struct MatchThePairsExerciseView: View {
   var store: StoreOf<MatchThePairsExerciseFeature>
