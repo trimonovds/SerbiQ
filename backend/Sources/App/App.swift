@@ -1,6 +1,6 @@
-import Vapor
 import Domain
 import IdentifiedCollections
+import Vapor
 
 // MARK: - Routes
 
@@ -26,18 +26,19 @@ func routes(_ app: Application) throws {
           pairs: [
             "mačka": "cat",
             "pas": "dog",
-            "kuća": "house"
+            "kuća": "house",
           ]
         )
       )
-    )
+    ),
   ]
 
   /// GET /exercise/:id
   /// Returns a JSON representation of the exercise with the given ID.
   app.get("exercise", ":id") { req -> Exercise in
     guard let exerciseID = req.parameters.get("id"),
-          let exercise = exercises[id: exerciseID] else {
+      let exercise = exercises[id: exerciseID]
+    else {
       throw Abort(.notFound, reason: "Exercise not found.")
     }
     return exercise

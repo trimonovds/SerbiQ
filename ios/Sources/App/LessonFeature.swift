@@ -6,8 +6,8 @@
 //
 
 import ComposableArchitecture
-import SwiftUI
 import Domain
+import SwiftUI
 
 @Reducer(state: .equatable, action: .equatable)
 enum ExerciseDataFeature {
@@ -40,14 +40,15 @@ struct ExerciseFeature {
 
     init(exercise: Exercise) {
       self.id = exercise.id
-      self.data = switch exercise.data {
-      case .matchThePairs(let matchThePairsData):
+      self.data =
+        switch exercise.data {
+        case .matchThePairs(let matchThePairsData):
           .matchThePairs(MatchThePairsExerciseFeature.State(data: matchThePairsData))
-      case .multipleChoice(let multipleChoiceData):
+        case .multipleChoice(let multipleChoiceData):
           .multipleChoice(MultipleChoiceExerciseFeature.State(data: multipleChoiceData))
-      default:
-        fatalError()
-      }
+        default:
+          fatalError()
+        }
     }
   }
 
@@ -68,7 +69,6 @@ struct ExerciseView: View {
     ExerciseDataView(store: store.scope(state: \.data, action: \.data))
   }
 }
-
 
 @Reducer
 struct LessonFeature {
@@ -134,7 +134,7 @@ struct LessonFeature {
           return .none
         }
       case .screen(.exercise(.data(.matchThePairs(.delegate(.complete))))),
-          .screen(.exercise(.data(.multipleChoice(.delegate(.complete))))):
+        .screen(.exercise(.data(.multipleChoice(.delegate(.complete))))):
         return .send(.currentExerciseComplete)
       case .screen(.lessonStart(.startButtonTapped)):
         withAnimation {
@@ -151,7 +151,7 @@ struct LessonFeature {
 }
 
 struct ProgressBarView: View {
-  let progress: CGFloat // Значение от 0 до 1
+  let progress: CGFloat  // Значение от 0 до 1
 
   var body: some View {
     GeometryReader { geometry in
@@ -188,7 +188,7 @@ struct LessonStartView: View {
         .resizable()
         .frame(width: 100, height: 100)
         .foregroundColor(.blue)
-        .animation(.spring(), value: UUID()) // Добавляет лёгкую анимацию
+        .animation(.spring(), value: UUID())  // Добавляет лёгкую анимацию
 
       Text("Начало урока")
         .font(.largeTitle)
@@ -232,7 +232,7 @@ struct LessonCompletedView: View {
         .resizable()
         .frame(width: 100, height: 100)
         .foregroundColor(.green)
-        .animation(.spring(), value: UUID()) // Добавляет лёгкую анимацию
+        .animation(.spring(), value: UUID())  // Добавляет лёгкую анимацию
 
       Text("Поздравляем!")
         .font(.largeTitle)
@@ -265,20 +265,28 @@ struct LessonView: View {
   var body: some View {
     switch store.screen {
     case .lessonStart:
-      if let lessonStartStore = store.scope(state: \.screen.lessonStart, action: \.screen.lessonStart) {
+      if let lessonStartStore = store.scope(
+        state: \.screen.lessonStart,
+        action: \.screen.lessonStart
+      ) {
         LessonStartView(store: lessonStartStore)
       }
     case .exercise:
       VStack {
-        ProgressBarView(progress: CGFloat(store.currentExerciseIndex) / CGFloat(store.exercises.count))
-          .padding()
+        ProgressBarView(
+          progress: CGFloat(store.currentExerciseIndex) / CGFloat(store.exercises.count)
+        )
+        .padding()
         if let exerciseStore = store.scope(state: \.screen.exercise, action: \.screen.exercise) {
           ExerciseView(store: exerciseStore)
         }
         Spacer()
       }
     case .lessonCompleted:
-      if let lessonCompletedStore = store.scope(state: \.screen.lessonCompleted, action: \.screen.lessonCompleted) {
+      if let lessonCompletedStore = store.scope(
+        state: \.screen.lessonCompleted,
+        action: \.screen.lessonCompleted
+      ) {
         LessonCompletedView(store: lessonCompletedStore)
       }
     }
@@ -286,33 +294,35 @@ struct LessonView: View {
 }
 
 #Preview {
-  LessonView(store: Store(
-    initialState: LessonFeature.State(exercises: [
-      Exercise(
-        id: "ex1",
-        data: .multipleChoice(
-          MultipleChoiceData(
-            question: "What does 'pas' mean in English?",
-            options: ["dog", "cat", "bird"],
-            correctAnswer: "dog"
+  LessonView(
+    store: Store(
+      initialState: LessonFeature.State(exercises: [
+        Exercise(
+          id: "ex1",
+          data: .multipleChoice(
+            MultipleChoiceData(
+              question: "What does 'pas' mean in English?",
+              options: ["dog", "cat", "bird"],
+              correctAnswer: "dog"
+            )
           )
-        )
-      ),
-      Exercise(
-        id: "ex2",
-        data: .matchThePairs(
-          MatchThePairsData(
-            prompt: "Match these Serbian words to their English translations:",
-            pairs: [
-              "mačka": "cat",
-              "pas": "dog",
-              "kuća": "house"
-            ]
+        ),
+        Exercise(
+          id: "ex2",
+          data: .matchThePairs(
+            MatchThePairsData(
+              prompt: "Match these Serbian words to their English translations:",
+              pairs: [
+                "mačka": "cat",
+                "pas": "dog",
+                "kuća": "house",
+              ]
+            )
           )
-        )
-      )
-    ])
-  ) {
-    LessonFeature()._printChanges()
-  })
+        ),
+      ])
+    ) {
+      LessonFeature()._printChanges()
+    }
+  )
 }

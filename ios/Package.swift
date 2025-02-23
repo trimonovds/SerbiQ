@@ -11,7 +11,7 @@ let package = Package(
     .library(
       name: "App",
       targets: ["App"]
-    ),
+    )
   ],
   dependencies: [
     .package(
