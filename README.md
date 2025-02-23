@@ -34,7 +34,7 @@ The pre-commit hook will automatically format your Swift files before each commi
 To manually format code before committing:
 
 ```sh
-tools/scripts/format-staged.sh
+tools/scripts/format.sh
 ```
 
 ### Building the Project
@@ -42,7 +42,7 @@ tools/scripts/format-staged.sh
 To build the project:
 
 ```sh
-tools/scripts/build-all.sh
+tools/scripts/build.sh
 ```
 
 ### Running Tests
@@ -50,7 +50,7 @@ tools/scripts/build-all.sh
 To run tests:
 
 ```sh
-tools/scripts/test-all.sh
+tools/scripts/test.sh
 ```
 
 ## 📜 License
