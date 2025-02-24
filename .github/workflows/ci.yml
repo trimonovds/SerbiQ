@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test-ios:
+    name: Build and Test project 
+    runs-on: macos-latest
+
+    steps:
+      - uses: swift-actions/setup-swift@v2.2.0
+      
+      - name: Print swift version
+        run: swift --version
+    
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build
+        run: |
+          tools/scripts/build.sh
+
+      - name: Test
+        run: |
+          tools/scripts/test.sh
+
+    #   - name: Build
+    #     env:
+    #       scheme: ${{ 'serbiq-ios' }}
+    #       platform: ${{ 'iOS Simulator' }}
+    #     run: |
+    #       cd ios
+    #       device=`xcrun xctrace list devices 2>&1 | grep -oE 'iPhone.*?[^\(]+' | head -1 | awk '{$1=$1;print}' | sed -e "s/ Simulator$//"`
+    #       xcodebuild build-for-testing -scheme "$scheme" -destination "platform=$platform,name=$device" -skipMacroValidation
+
+    #   - name: Test
+    #     env:
+    #       scheme: ${{ 'serbiq-ios' }}
+    #       platform: ${{ 'iOS Simulator' }}
+    #     run: |
+    #       cd ios
+    #       device=`xcrun xctrace list devices 2>&1 | grep -oE 'iPhone.*?[^\(]+' | head -1 | awk '{$1=$1;print}' | sed -e "s/ Simulator$//"`
+    #       xcodebuild test-without-building -scheme "$scheme" -destination "platform=$platform,name=$device" -skipMacroValidation
